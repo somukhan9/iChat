@@ -5,6 +5,10 @@ const Error = ({ error, setError }) => {
     setTimeout(() => {
       setError('')
     }, 2000)
+
+    return () => {
+      clearTimeout()
+    }
   }, [setError])
 
   return <div className="error">{error}</div>

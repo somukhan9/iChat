@@ -69,7 +69,7 @@ const Register = () => {
       // console.log(res.user)
     } catch (error) {
       console.error(error)
-      setError(error)
+      setError(error.message)
       setLoading(false)
     }
   }
