@@ -12,13 +12,16 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuthContext } from '../context/AuthContext'
+import { useChatContext } from '../context/ChatContext'
 import Error from './Error'
+import { ACTION_TYPES } from '../constants/action-types'
 
 const Search = () => {
   const [error, setError] = useState('')
   const [username, setUsername] = useState('')
   const [users, setUsers] = useState([])
   const { currentUser } = useAuthContext()
+  const { dispatch } = useChatContext()
 
   const handleSearch = async () => {
     try {
@@ -34,20 +37,17 @@ const Search = () => {
           tempUsers.push(doc.data())
         }
       })
-      setUsers(tempUsers)
 
-      if (users.length === 0) {
-        setError(`No user found with name "${username}"`)
-      }
+      setUsers(tempUsers)
     } catch (error) {
       console.error(error)
       setError(error.message)
     }
-    setUsername('')
   }
 
-  const handleKeyDown = (e) => {
-    e.code === 'Enter' && handleSearch()
+  const handleKey = (e) => {
+    // e.code === 'Enter' && handleSearch()
+    handleSearch()
   }
 
   const handleSelect = async (user) => {
@@ -69,6 +69,7 @@ const Search = () => {
             uid: user.uid,
             displayName: user.displayName,
             photoURL: user.photoURL,
+            email: user.email,
           },
           [combinedID + '.date']: serverTimestamp(),
         })
@@ -79,9 +80,12 @@ const Search = () => {
             uid: currentUser.uid,
             displayName: currentUser.displayName,
             photoURL: currentUser.photoURL,
+            email: currentUser.email,
           },
           [combinedID + '.date']: serverTimestamp(),
         })
+      } else {
+        dispatch({ type: ACTION_TYPES.CHANGE_USER, payload: { user } })
       }
 
       setUsername('')
@@ -102,9 +106,10 @@ const Search = () => {
           placeholder="Find a user"
           onChange={(e) => setUsername(e.target.value)}
           value={username}
-          onKeyDown={handleKeyDown}
+          onKeyUp={handleKey}
         />
       </div>
+
       {error && <Error error={error} setError={setError} />}
 
       {users &&

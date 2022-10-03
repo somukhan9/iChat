@@ -31,7 +31,6 @@ const Chats = () => {
   const handleSelect = (user) => {
     dispatch({ type: ACTION_TYPES.CHANGE_USER, payload: { user } })
   }
-
   return Object.entries(chats)
     ?.sort((a, b) => b[1].data - a[1].data)
     .map((chat) => (
